@@ -6,7 +6,9 @@ namespace patch {
 
     void clear_dc_ic_cache(void* ptr, u32 size);
 
-// These return the overwritten word
+    u32 read_word(void* ptr);
+
+    // These return the overwritten word
     u32 write_branch(void* ptr, void* destination);
     u32 write_branch_bl(void* ptr, void* destination);
     u32 write_blr(void* ptr);

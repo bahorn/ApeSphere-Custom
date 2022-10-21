@@ -6,6 +6,7 @@
 #include "version.h"
 #include "modlink.h"
 #include <mkb.h>
+#include "vm/vm.h"
 
 #define STREQ(x,y) (mkb::strcmp(const_cast<char*>(x),const_cast<char*>(y))==0)
 
@@ -16,6 +17,9 @@ static patch::Tramp<decltype(&mkb::draw_debugtext)> s_draw_debugtext_tramp;
 static patch::Tramp<decltype(&mkb::process_inputs)> s_process_inputs_tramp;
 static patch::Tramp<decltype(&mkb::load_additional_rel)> s_load_additional_rel_tramp;
 
+
+VM vm;
+int tick_count;
 bool debug_mode_enabled = false;
 
 static void perform_assembly_patches()
@@ -42,6 +46,10 @@ void init()
 
     heap::init();
     modlink::write();
+
+    tick_count = 0;
+    vm.load("/bytecode.qvm");
+    vm.call(0);
 
     perform_assembly_patches();
 
@@ -124,6 +132,8 @@ void tick()
         mkb::dip_switches &= ~(mkb::DIP_DEBUG | mkb::DIP_DISP);
     }*/
     pad::on_frame_start();
+    vm.call(1, tick_count);
+    tick_count += 1;
 }
 
 }
